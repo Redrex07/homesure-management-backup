@@ -22,9 +22,9 @@ function InvoicesPage() {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(PageHeader, { title: "Invoices", description: "Track billing, payments and overdue accounts." }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-3", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(StatCard, { label: "Paid (mo)", value: `$${paid.toLocaleString()}`, icon: DollarSign, tone: "success" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(StatCard, { label: "Pending", value: `$${pending.toLocaleString()}`, icon: Clock, tone: "warning" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(StatCard, { label: "Overdue", value: `$${overdue.toLocaleString()}`, icon: TriangleAlert, tone: "destructive" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx(StatCard, { label: "Paid (mo)", value: `₹${paid.toLocaleString()}`, icon: DollarSign, tone: "success" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(StatCard, { label: "Pending", value: `₹${pending.toLocaleString()}`, icon: Clock, tone: "warning" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(StatCard, { label: "Overdue", value: `₹${overdue.toLocaleString()}`, icon: TriangleAlert, tone: "destructive" })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(DataTable, { rows: invoices, filterKeys: ["id", "request"], columns: [{
       key: "id",
@@ -45,7 +45,7 @@ function InvoicesPage() {
       header: "Amount",
       sortable: true,
       render: (i) => /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium", children: [
-        "$",
+        "₹",
         i.amount.toLocaleString()
       ] })
     }, {

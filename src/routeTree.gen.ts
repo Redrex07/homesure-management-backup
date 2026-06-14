@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TestSupabaseRouteImport } from './routes/test-supabase'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
@@ -33,6 +34,11 @@ import { Route as AppAppointmentsRouteImport } from './routes/app.appointments'
 import { Route as AppAnalyticsRouteImport } from './routes/app.analytics'
 import { Route as AppPropertiesIdRouteImport } from './routes/app.properties.$id'
 
+const TestSupabaseRoute = TestSupabaseRouteImport.update({
+  id: '/test-supabase',
+  path: '/test-supabase',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/test-supabase': typeof TestSupabaseRoute
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/appointments': typeof AppAppointmentsRoute
   '/app/audit-logs': typeof AppAuditLogsRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/test-supabase': typeof TestSupabaseRoute
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/appointments': typeof AppAppointmentsRoute
   '/app/audit-logs': typeof AppAuditLogsRoute
@@ -207,6 +215,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/test-supabase': typeof TestSupabaseRoute
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/appointments': typeof AppAppointmentsRoute
   '/app/audit-logs': typeof AppAuditLogsRoute
@@ -234,6 +243,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/test-supabase'
     | '/app/analytics'
     | '/app/appointments'
     | '/app/audit-logs'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/test-supabase'
     | '/app/analytics'
     | '/app/appointments'
     | '/app/audit-logs'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/test-supabase'
     | '/app/analytics'
     | '/app/appointments'
     | '/app/audit-logs'
@@ -310,10 +322,18 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
+  TestSupabaseRoute: typeof TestSupabaseRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/test-supabase': {
+      id: '/test-supabase'
+      path: '/test-supabase'
+      fullPath: '/test-supabase'
+      preLoaderRoute: typeof TestSupabaseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -537,6 +557,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
+  TestSupabaseRoute: TestSupabaseRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

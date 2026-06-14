@@ -1,94 +1,306 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/common/PageHeader";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { DataTable } from "@/components/common/DataTable";
-import { serviceRequests } from "@/lib/mock-data";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/service-requests")({
-  head: () => ({ meta: [{ title: "Service Requests — HomeSure" }] }),
+  head: () => ({
+    meta: [{ title: "Service Requests — HomeSure" }],
+  }),
   component: ServiceRequestsPage,
 });
 
 function ServiceRequestsPage() {
-  const [category, setCategory] = useState<string>("all");
-  const [priority, setPriority] = useState<string>("all");
+  const [requests, setRequests] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [statusFilter, setStatusFilter] = useState("all");
   const [open, setOpen] = useState(false);
 
-  const filtered = serviceRequests.filter((r) =>
-    (category === "all" || r.category === category) &&
-    (priority === "all" || r.priority === priority)
-  );
+  useEffect(() => {
+    loadRequests();
+  }, []);
+
+  async function loadRequests() {
+    const { data, error } = await supabase
+      .from("service_requests")
+      .select(`
+        request_id,
+        title,
+        description,
+        status,
+        created_at,
+        properties (
+          property_name
+        ),
+        tenants (
+          tenant_id,
+          users (
+            full_name
+          )
+        ),
+        contractors (
+          trade,
+          users (
+            full_name
+          )
+        )
+      `);
+
+    if (error) {
+      console.error(error);
+      setLoading(false);
+      return;
+    }
+
+    const formatted =
+      data?.map((r: any) => ({
+        id: r.request_id,
+        title: r.title,
+        description: r.description,
+        property:
+          r.properties?.property_name ?? "Unknown Property",
+
+        tenant:
+          r.tenants?.users?.full_name ?? "Unknown Tenant",
+
+        contractor:
+          r.contractors?.users?.full_name ??
+          "Unassigned",
+
+        trade:
+          r.contractors?.trade ?? "-",
+
+        status: r.status,
+
+        created:
+          new Date(r.created_at).toLocaleDateString(
+            "en-IN"
+          ),
+      })) || [];
+
+    setRequests(formatted);
+    setLoading(false);
+  }
+
+  const filtered =
+    statusFilter === "all"
+      ? requests
+      : requests.filter(
+          (r) =>
+            r.status.toLowerCase() ===
+            statusFilter.toLowerCase()
+        );
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        Loading service requests...
+      </div>
+    );
+  }
 
   return (
     <>
       <PageHeader
-        title="Service requests"
+        title="Service Requests"
         description="Track maintenance work end-to-end."
         actions={
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild><Button size="sm"><Plus className="mr-2 h-4 w-4" /> New request</Button></DialogTrigger>
+          <Dialog
+            open={open}
+            onOpenChange={setOpen}
+          >
+            <DialogTrigger asChild>
+              <Button size="sm">
+                <Plus className="mr-2 h-4 w-4" />
+                New Request
+              </Button>
+            </DialogTrigger>
+
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create service request</DialogTitle>
-                <DialogDescription>Submit a new maintenance ticket. A contractor will be assigned shortly.</DialogDescription>
+                <DialogTitle>
+                  Create Service Request
+                </DialogTitle>
+
+                <DialogDescription>
+                  Submit a maintenance request.
+                </DialogDescription>
               </DialogHeader>
-              <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); toast.success("Request submitted"); setOpen(false); }}>
-                <div className="space-y-1.5"><Label>Title</Label><Input placeholder="e.g. Leaking sink" required /></div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5"><Label>Category</Label>
-                    <Select defaultValue="Plumbing"><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{["Plumbing","Electrical","HVAC","Landscaping","Painting","Appliance","Locksmith"].map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent></Select>
-                  </div>
-                  <div className="space-y-1.5"><Label>Priority</Label>
-                    <Select defaultValue="Medium"><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{["Low","Medium","High","Urgent"].map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent></Select>
-                  </div>
+
+              <form
+                className="space-y-3"
+                onSubmit={(e) => {
+                  e.preventDefault();
+
+                  toast.success(
+                    "Request created successfully"
+                  );
+
+                  setOpen(false);
+                }}
+              >
+                <div className="space-y-1.5">
+                  <Label>Title</Label>
+
+                  <Input
+                    placeholder="Leaking Sink"
+                  />
                 </div>
-                <div className="space-y-1.5"><Label>Description</Label><Textarea rows={3} placeholder="Describe the issue…" /></div>
-                <DialogFooter><Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button><Button type="submit">Submit</Button></DialogFooter>
+
+                <div className="space-y-1.5">
+                  <Label>Description</Label>
+
+                  <Textarea
+                    rows={3}
+                    placeholder="Describe issue..."
+                  />
+                </div>
+
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button type="submit">
+                    Submit
+                  </Button>
+                </DialogFooter>
               </form>
             </DialogContent>
           </Dialog>
         }
       />
+
       <DataTable
         rows={filtered}
-        filterKeys={["title", "id", "property", "tenant"] as any}
-        toolbar={<>
-          <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger className="h-9 w-40"><SelectValue placeholder="Category" /></SelectTrigger>
+        filterKeys={[
+          "title",
+          "property",
+          "tenant",
+          "contractor",
+        ] as any}
+        toolbar={
+          <Select
+            value={statusFilter}
+            onValueChange={setStatusFilter}
+          >
+            <SelectTrigger className="h-9 w-40">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+
             <SelectContent>
-              <SelectItem value="all">All categories</SelectItem>
-              {["Plumbing","Electrical","HVAC","Landscaping","Painting","Appliance","Locksmith"].map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+              <SelectItem value="all">
+                All Status
+              </SelectItem>
+
+              <SelectItem value="open">
+                Open
+              </SelectItem>
+
+              <SelectItem value="in progress">
+                In Progress
+              </SelectItem>
+
+              <SelectItem value="completed">
+                Completed
+              </SelectItem>
             </SelectContent>
           </Select>
-          <Select value={priority} onValueChange={setPriority}>
-            <SelectTrigger className="h-9 w-32"><SelectValue placeholder="Priority" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              {["Low","Medium","High","Urgent"].map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </>}
+        }
         columns={[
-          { key: "id", header: "ID", render: (r) => <span className="font-mono text-xs text-muted-foreground">{r.id}</span> },
-          { key: "title", header: "Request", sortable: true, render: (r) => (
-            <div><div className="text-sm font-medium">{r.title}</div><div className="text-xs text-muted-foreground">{r.category}</div></div>
-          )},
-          { key: "property", header: "Property" },
-          { key: "tenant", header: "Tenant" },
-          { key: "priority", header: "Priority", render: (r) => <StatusBadge value={r.priority} /> },
-          { key: "contractor", header: "Contractor", render: (r) => r.contractor ?? <span className="text-muted-foreground">Unassigned</span> },
-          { key: "status", header: "Status", render: (r) => <StatusBadge value={r.status} /> },
+          {
+            key: "id",
+            header: "ID",
+            render: (r: any) => (
+              <span className="font-mono text-xs text-muted-foreground">
+                #{r.id}
+              </span>
+            ),
+          },
+
+          {
+            key: "title",
+            header: "Request",
+            sortable: true,
+            render: (r: any) => (
+              <div>
+                <div className="font-medium">
+                  {r.title}
+                </div>
+
+                <div className="text-xs text-muted-foreground">
+                  {r.description}
+                </div>
+              </div>
+            ),
+          },
+
+          {
+            key: "property",
+            header: "Property",
+          },
+
+          {
+            key: "tenant",
+            header: "Tenant",
+          },
+
+          {
+            key: "contractor",
+            header: "Contractor",
+          },
+
+          {
+            key: "trade",
+            header: "Trade",
+          },
+
+          {
+            key: "created",
+            header: "Created",
+          },
+
+          {
+            key: "status",
+            header: "Status",
+            render: (r: any) => (
+              <StatusBadge value={r.status} />
+            ),
+          },
         ]}
       />
     </>

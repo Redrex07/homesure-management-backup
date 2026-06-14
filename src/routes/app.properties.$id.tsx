@@ -46,7 +46,7 @@ function PropertyDetail() {
         </Card>
 
         <div className="space-y-4">
-          <StatCard label="Rent collected" value={`$${(p.rent * 6).toLocaleString()}`} icon={DollarSign} tone="success" delta={8} />
+          <StatCard label="Rent collected" value={`₹${stats.revenue.toLocaleString("en-IN")}`} icon={DollarSign} tone="success" delta={11} />
           <StatCard label="Tenant" value={p.tenant ?? "Vacant"} icon={Users} tone="info" />
           <StatCard label="Open requests" value={String(reqs.filter(r => r.status !== "Completed").length)} icon={Wrench} tone="warning" />
         </div>

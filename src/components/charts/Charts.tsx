@@ -44,8 +44,8 @@ export function RevenueArea({ data }: { data: { month: string; revenue: number; 
         </defs>
         <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
         <XAxis dataKey="month" stroke="var(--color-muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
-        <YAxis stroke="var(--color-muted-foreground)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `$${(v/1000)}k`} />
-        <Tooltip {...tooltipStyle} formatter={(v: number) => `$${v.toLocaleString()}`} />
+        <YAxis stroke="var(--color-muted-foreground)" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `₹${(v/1000)}k`} />
+        <Tooltip {...tooltipStyle} formatter={(v: number) => `₹${v.toLocaleString()}`} />
         <Area type="monotone" dataKey="revenue" stroke="var(--color-primary)" strokeWidth={2} fill="url(#rev)" />
         <Area type="monotone" dataKey="expenses" stroke="var(--color-info)" strokeWidth={2} fill="url(#exp)" />
       </AreaChart>

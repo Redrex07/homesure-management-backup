@@ -24,7 +24,7 @@ function SubsPage() {
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 sm:grid-cols-3", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(StatCard, { label: "Active subs", value: String(subscriptions.filter((s) => s.status === "Active").length), icon: CreditCard, tone: "success" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(StatCard, { label: "MRR", value: `$${mrr.toLocaleString()}`, icon: DollarSign, tone: "success", delta: 14 }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(StatCard, { label: "MRR", value: `₹${mrr.}`, icon: DollarSign, tone: "success", delta: 14 }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(StatCard, { label: "Trials", value: String(subscriptions.filter((s) => s.status === "Trial").length), icon: TrendingUp, tone: "info" })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(DataTable, { rows: subscriptions, filterKeys: ["customer", "plan"], columns: [{

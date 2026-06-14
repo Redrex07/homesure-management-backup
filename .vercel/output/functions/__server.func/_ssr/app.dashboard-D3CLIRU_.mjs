@@ -58,7 +58,7 @@ import "../_libs/seroval-plugins.mjs";
 import "node:stream/web";
 import "node:stream";
 import "../_libs/isbot.mjs";
-const fmt = (n) => `$${n.toLocaleString()}`;
+const fmt = (n) => `₹${n.toLocaleString()}`;
 function SuperAdminDashboard() {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -76,7 +76,7 @@ function SuperAdminDashboard() {
       /* @__PURE__ */ jsxRuntimeExports.jsx(StatCard, { label: "Total users", value: "4,218", icon: Users, delta: 12, hint: "vs last month" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(StatCard, { label: "Active properties", value: "1,847", icon: Building2, delta: 8, tone: "info", hint: "across 14 regions" }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(StatCard, { label: "Active subscriptions", value: "612", icon: CreditCard, delta: 5, tone: "success" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(StatCard, { label: "Monthly revenue", value: "$71,900", icon: DollarSign, delta: 18, tone: "success", hint: "MRR" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx(StatCard, { label: "Monthly revenue", value: "₹71,900", icon: DollarSign, delta: 18, tone: "success", hint: "MRR" })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid gap-4 lg:grid-cols-3", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(ChartCard, { title: "Revenue & expenses", className: "lg:col-span-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(RevenueArea, { data: revenueSeries }) }),

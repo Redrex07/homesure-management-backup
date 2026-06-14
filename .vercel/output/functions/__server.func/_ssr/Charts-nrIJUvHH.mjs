@@ -52,8 +52,8 @@ function RevenueArea({ data }) {
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(CartesianGrid, { strokeDasharray: "3 3", stroke: "var(--color-border)", vertical: false }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(XAxis, { dataKey: "month", stroke: "var(--color-muted-foreground)", fontSize: 11, tickLine: false, axisLine: false }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(YAxis, { stroke: "var(--color-muted-foreground)", fontSize: 11, tickLine: false, axisLine: false, tickFormatter: (v) => `$${v / 1e3}k` }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, { ...tooltipStyle, formatter: (v) => `$${v.toLocaleString()}` }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(YAxis, { stroke: "var(--color-muted-foreground)", fontSize: 11, tickLine: false, axisLine: false, tickFormatter: (v) => `₹${(v / 1e3).toLocaleString()}k` }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, { ...tooltipStyle, formatter: (v) => `₹${v.toLocaleString()}` }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Area, { type: "monotone", dataKey: "revenue", stroke: "var(--color-primary)", strokeWidth: 2, fill: "url(#rev)" }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Area, { type: "monotone", dataKey: "expenses", stroke: "var(--color-info)", strokeWidth: 2, fill: "url(#exp)" })
   ] }) });

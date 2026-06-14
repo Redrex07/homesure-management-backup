@@ -55,7 +55,7 @@ function TenantsPage() {
     }, {
       key: "rent",
       header: "Rent",
-      render: (t) => t.rent ? `$${t.rent.toLocaleString()}` : "—"
+      render: (t) => t.rent ? `₹${t.rent.toLocaleString()}` : "—"
     }, {
       key: "status",
       header: "Status",

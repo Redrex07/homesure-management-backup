@@ -6,6 +6,8 @@ import { StatCard } from "@/components/common/StatCard";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { PageHeader } from "@/components/common/PageHeader";
 import { ChartCard, RevenueArea, RequestsBar, CategoryPie } from "@/components/charts/Charts";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 import {
   Users, Building2, CreditCard, DollarSign, Wrench, ClipboardCheck, HardHat, Clock,
   LifeBuoy, CheckCircle2, AlertTriangle, FileText, Calendar, Receipt, Eye, Plus,
@@ -17,9 +19,10 @@ import {
   categoryBreakdown, listings, leaseDocs,
 } from "@/lib/mock-data";
 import { Link } from "@tanstack/react-router";
-import { useSession } from "@/lib/auth-store";
 
-const fmt = (n: number) => `$${n.toLocaleString()}`;
+
+const fmt = (n: number) =>
+  `₹${n.toLocaleString("en-IN")}`;
 
 /* ---------------- SUPER ADMIN ---------------- */
 export function SuperAdminDashboard() {
@@ -34,7 +37,7 @@ export function SuperAdminDashboard() {
         <StatCard label="Total users" value="4,218" icon={Users} delta={12} hint="vs last month" />
         <StatCard label="Active properties" value="1,847" icon={Building2} delta={8} tone="info" hint="across 14 regions" />
         <StatCard label="Active subscriptions" value="612" icon={CreditCard} delta={5} tone="success" />
-        <StatCard label="Monthly revenue" value="$71,900" icon={DollarSign} delta={18} tone="success" hint="MRR" />
+        <StatCard label="Monthly revenue"value="₹71,900"icon={DollarSign}delta={18}tone="success"hint="MRR"/>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
@@ -178,10 +181,61 @@ export function ServiceAdminDashboard() {
 
 /* ---------------- LANDLORD ---------------- */
 export function LandlordDashboard() {
-  const occupied = properties.filter((p) => p.status === "Occupied").length;
-  const occupancy = Math.round((occupied / properties.length) * 100);
-  const collected = invoices.filter((i) => i.status === "Paid").reduce((s, i) => s + i.amount, 0);
-  const outstanding = invoices.filter((i) => i.status !== "Paid").reduce((s, i) => s + i.amount, 0);
+  const [stats, setStats] = useState({
+    properties: 0,
+    tenants: 0,
+    requests: 0,
+    occupied: 0,
+    revenue: 0,
+  });
+
+  useEffect(() => {
+   void loadDashboard();
+  }, []);
+
+  async function loadDashboard() {
+    const { count: properties } = await supabase
+      .from("properties")
+      .select("*", { count: "exact", head: true });
+
+    const { count: tenants } = await supabase
+      .from("tenants")
+      .select("*", { count: "exact", head: true });
+
+    const { count: requests } = await supabase
+      .from("service_requests")
+      .select("*", { count: "exact", head: true });
+
+    const { count: occupied } = await supabase
+      .from("properties")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "Occupied");
+
+    const { data: rents } = await supabase
+      .from("properties")
+      .select("rent_amount");
+
+    const revenue =
+      rents?.reduce(
+        (sum, p) => sum + Number(p.rent_amount || 0),
+        0
+      ) || 0;
+
+    setStats({
+      properties: properties || 0,
+      tenants: tenants || 0,
+      requests: requests || 0,
+      occupied: occupied || 0,
+      revenue,
+    });
+  }
+
+  const occupancy =
+    stats.properties > 0
+      ? Math.round(
+          (stats.occupied / stats.properties) * 100
+        )
+      : 0;
 
   return (
     <>
@@ -191,10 +245,10 @@ export function LandlordDashboard() {
         actions={<Link to="/app/properties"><Button size="sm"><Plus className="mr-2 h-4 w-4" /> Add property</Button></Link>}
       />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard label="Properties" value={String(properties.length)} icon={Building2} delta={4} />
-        <StatCard label="Active tenants" value={String(tenants.filter(t => t.status === "Active").length)} icon={Users} tone="info" delta={2} />
-        <StatCard label="Rent collected" value={fmt(collected)} icon={DollarSign} tone="success" delta={11} />
-        <StatCard label="Open requests" value={String(serviceRequests.filter(r => r.status !== "Completed").length)} icon={Wrench} tone="warning" delta={-3} />
+        <StatCard label="Properties" value={String(stats.properties)} icon={Building2} delta={4} />
+        <StatCard label="Active tenants" value={String(stats.tenants)} icon={Users} tone="info" delta={2} />
+        <StatCard label="Rent collected" value={`₹${stats.revenue.toLocaleString("en-IN")}`} icon={DollarSign} tone="success" delta={11} />
+        <StatCard label="Open requests" value={String(stats.requests)} icon={Wrench} tone="warning" delta={-3} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
@@ -204,11 +258,11 @@ export function LandlordDashboard() {
           <CardContent>
             <div className="flex items-baseline gap-2">
               <div className="text-4xl font-bold">{occupancy}%</div>
-              <div className="text-sm text-muted-foreground">{occupied} of {properties.length}</div>
+              <div className="text-sm text-muted-foreground">{stats.occupied} of {stats.properties}</div>
             </div>
             <Progress value={occupancy} className="mt-4" />
             <div className="mt-5 space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-muted-foreground">Outstanding rent</span><span className="font-semibold">{fmt(outstanding)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Outstanding rent</span><span className="font-semibold">₹0</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Avg. days to fill</span><span className="font-semibold">12 days</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Renewals (90d)</span><span className="font-semibold">3</span></div>
             </div>

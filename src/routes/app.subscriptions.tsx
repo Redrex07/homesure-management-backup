@@ -19,7 +19,7 @@ function SubsPage() {
       <PageHeader title="Subscriptions" description="Plans, billing and renewals." actions={<Button size="sm"><Plus className="mr-2 h-4 w-4" /> Add subscription</Button>} />
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard label="Active subs" value={String(subscriptions.filter(s => s.status === "Active").length)} icon={CreditCard} tone="success" />
-        <StatCard label="MRR" value={`$${mrr.toLocaleString()}`} icon={DollarSign} tone="success" delta={14} />
+        <StatCard label="MRR" value={`₹${mrr.toLocaleString()}`} icon={DollarSign} tone="success" delta={14} />
         <StatCard label="Trials" value={String(subscriptions.filter(s => s.status === "Trial").length)} icon={TrendingUp} tone="info" />
       </div>
       <DataTable
